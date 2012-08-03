@@ -81,6 +81,10 @@ class Duoshuo_LocalServer{
 		
 		$this->plugin->updateOption('sync_lock',  0);
 		
+		$this->plugin->updateCommentsCount($affectedThreads);
+		
+		$this->plugin->updateOption('sync_lock',  1);
+		
 		$this->response['code'] = Duoshuo_Exception::SUCCESS;
 	}
 	

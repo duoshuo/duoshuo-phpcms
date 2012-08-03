@@ -140,6 +140,7 @@ class Duoshuo_Phpcms extends Duoshuo_Abstract{
 		if($synced){//create操作的评论，没同步过才处理
 			return null;
 		}
+		$commentidList = array();
 		if(!empty($meta['thread_key'])){
 			$commentid = $meta['thread_key'];
 			$data = get_comment_api($commentid);
@@ -228,17 +229,10 @@ class Duoshuo_Phpcms extends Duoshuo_Abstract{
 			$row = $this->comment_table_db->get_one('', 'tableid, total', 'tableid desc');
 			$tableid = $row['tableid'];
 			if ($commentDataId = $this->comment_data_db->insert($data, true)) {
-				//开始更新数据存储表数据总条数
-				$count = $this->comment_data_db->count();
-				$this->comment_table_db->edit_total($tableid, $count);//改进原系统的计数方式 by duoshuo
-				//开始更新评论总表数据总数
-				$sql['lastupdate'] = SYS_TIME;
 				//只有在评论通过的时候才更新评论主表的评论数
 				if ($data['status'] == 1) {
-					$count = $this->comment_data_db->count(array('commentid'=>$commentid,'status' => 1));
-					$sql['total'] = $count;//改进原系统的计数方式 by duoshuo
+					$commentidList[] = $commentid;
 				}
-				$this->comment_db->update($sql, array('commentid'=>$commentid));
 				$this->msg_code = 0;
 				//记录反向回流结果
 				$metaModel = new duoshuo_commentmeta_model();
@@ -248,7 +242,7 @@ class Duoshuo_Phpcms extends Duoshuo_Abstract{
 						'tableid'	=> $tableid,
 						'cid'		=> $commentDataId,
 				), TRUE);
-				return array($commentid);
+				return $commentidList;
 			} else {
 				$this->msg_code = 3;
 				return null;
@@ -258,7 +252,7 @@ class Duoshuo_Phpcms extends Duoshuo_Abstract{
 	}
 	
 	public function moderatePost($action, $postIdArray){
-		$aidList = array();
+		$commentidList = array();
 		foreach($postIdArray as $postId){
 			$synced = $this->duoshuo_commentmeta_db->get_one(array('post_id'=>$postId));
 			if(!is_array($synced)){//非create操作的评论，同步过才处理
@@ -274,18 +268,14 @@ class Duoshuo_Phpcms extends Duoshuo_Abstract{
 			}
 			
 			$commentData = $this->comment_data_db->update(array('status'=>self::$actionMap[$action]),array('id'=>$cid));
-			//开始更新评论总表数据总数
-			$count = $this->comment_data_db->count(array('commentid'=>$commentData['commentid'],'status' => 1));
-			$sql['lastupdate'] = SYS_TIME;
-			$sql['total'] = $count;//改进原系统的计数方式 by duoshuo
-			$this->comment_db->update($sql, array('commentid'=>$commentData['commentid']));
-			$aidList[] = $commentData['commentid'];
+			
+			$commentidList[] = $commentData['commentid'];
 		}
-		return $aidList;
+		return $commentidList;
 	}
 	
 	public function deleteForeverPost($postIdArray){
-		$aidList = array();
+		$commentidList = array();
 		foreach($postIdArray as $postId){
 			$synced = $this->duoshuo_commentmeta_db->get_one(array('post_id'=>$postId));
 			if(!is_array($synced)){//非create操作的评论，同步过才处理
@@ -300,20 +290,25 @@ class Duoshuo_Phpcms extends Duoshuo_Abstract{
 				continue;
 			}
 			$this->comment_data_db->delete(array('id'=>$cid, 'commentid'=>$commentData['commentid']));
-			//开始更新评论总表数据总数
-			$count = $this->comment_data_db->count(array('commentid'=>$commentData['commentid'],'status' => 1));
-			$sql['lastupdate'] = SYS_TIME;
-			$sql['total'] = $count;//改进原系统的计数方式 by duoshuo
-			$this->comment_db->update($sql, array('commentid'=>$commentData['commentid']));
-			$aidList[] = $commentData['commentid'];
+			$commentidList[] =  $commentData['commentid'];
 		}
-		return $aidList;
+		return $commentidList;
 	}
 	
-	public function refreshThreads($aidList){
+	public function updateCommentsCount($commentidList){
+		foreach($commentidList as $commentid){
+			//开始更新评论总表数据总数
+			$count = $this->comment_data_db->count(array('commentid'=>$commentid,'status' => 1));
+			$sql['lastupdate'] = SYS_TIME;
+			$sql['total'] = $count;//改进原系统的计数方式 by duoshuo
+			$this->comment_db->update($sql, array('commentid'=>$commentid));
+		}
+	}
+	
+	public function refreshThreads($commentidList){
 		//phpcms下暂无此功能
-		/*foreach($aidList as $aid){
-			$arc = new Archives($aid);
+		/*foreach($commentidList as $commentid){
+			$arc = new Archives($commentid);
 			$arc->MakeHtml();
 		}*/
 	}
