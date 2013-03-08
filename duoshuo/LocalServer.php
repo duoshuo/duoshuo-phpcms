@@ -68,7 +68,7 @@ class Duoshuo_LocalServer{
 				
 				$affectedThreads = array_merge($affectedThreads, $affected);
 			
-				if (strlen($log['log_id']) > strlen($last_log_id) || strcmp($log['log_id'], $last_log_id) > 0)
+				if (strlen($log['log_id']) > strlen($max_sync_id) || strcmp($log['log_id'], $max_sync_id) > 0)
 					$max_sync_id = $log['log_id'];
 			}
 			
