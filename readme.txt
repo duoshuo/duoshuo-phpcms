@@ -18,7 +18,7 @@
 建回流表：
 
 CREATE TABLE IF NOT EXISTS `v9_duoshuo_commentmeta` (
-  `post_id` int(10) unsigned NOT NULL COMMENT '多说评论id',
+  `post_id` bigint(20) unsigned NOT NULL COMMENT '多说评论id',
   `tableid` int(11) unsigned NOT NULL COMMENT '表id号',
   `cid` int(10) unsigned NOT NULL COMMENT '本地表内评论id',
   PRIMARY KEY (`post_id`),
