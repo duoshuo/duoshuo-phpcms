@@ -16,12 +16,12 @@
 8.数据库操作(建回流表)
 建回流表：
 
-CREATE TABLE IF NOT EXISTS `v9_duoshuo_commentmeta` (
-  `post_id` bigint(20) unsigned NOT NULL COMMENT '多说评论id',
-  `tableid` int(11) unsigned NOT NULL COMMENT '表id号',
-  `cid` int(10) unsigned NOT NULL COMMENT '本地表内评论id',
-  PRIMARY KEY (`post_id`),
-  KEY `tableid` (`tableid`,`cid`)
+CREATE TABLE IF NOT EXISTS `v9_duoshuo_commentmeta` (  
+  `post_id` bigint(20) unsigned NOT NULL COMMENT '多说评论id',  
+  `tableid` int(11) unsigned NOT NULL COMMENT '表id号',  
+  `cid` int(10) unsigned NOT NULL COMMENT '本地表内评论id',  
+  PRIMARY KEY (`post_id`),  
+  KEY `tableid` (`tableid`,`cid`)  
 ) ENGINE=MyISAM;
 
 ====！！申请站点后跟小武联系，告知你申请的多说二级域名以及api接口地址,一般是http://xxxxx.com/api.php?op=duoshuo
