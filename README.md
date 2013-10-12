@@ -1,7 +1,7 @@
 ﻿
 1.访问http://duoshuo.com/create-site/ 创建多说站点，在管理后台获取代码
 
-2.将目录拷贝到phpcms主目录下(api目录会合并到原api目录)
+2.将本代码库的文件下载，选择与phpcms相同的encode(utf8或gbk)，将其中的子目录拷贝到phpcms主目录下(api目录会合并到原api目录)
 
 3.访问你站点下的duoshuo安装接口：http://xxxxx.com/api.php?op=duoshuo_install
 
